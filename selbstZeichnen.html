@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="de-ch">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Robin's coole Animation</title>
+    <style>
+    canvas:hover {
+        cursor: none;
+    }
+    </style>
+</head>
+
+<body>
+
+    <canvas></canvas>
+    <script>
+
+        let zuf = (Math.random());
+        let zuf0 = (Math.random());
+        let zuf1 = (Math.random());
+        let zuf2 = (Math.random() * 2);
+        let zuf25 = (Math.random() * 25);
+        let zuf10 = (Math.random() * 10);
+        let zuf200 = (Math.random() * 200);
+
+
+        function randomIntFromRange(min, max) {
+            return Math.floor(Math.random() * (max - min + 1) + min)
+        }
+
+        function randomColor(colors) {
+            return colors[Math.floor(Math.random() * colors.length)]
+        }
+
+        function distance(x1, y1, x2, y2) {
+            const xDist = x2 - x1
+            const yDist = y2 - y1
+
+            return Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2))
+        }
+
+        function getPosition(el) {
+            var xPosition = 0;
+            var yPosition = 0;
+
+            while (el) {
+                xPosition += (el.offsetLeft - el.scrollLeft + el.clientLeft);
+                yPosition += (el.offsetTop - el.scrollTop + el.clientTop);
+                el = el.offsetParent;
+            }
+            return {
+                x: xPosition,
+                y: yPosition
+            };
+        }
+        const canvas = document.querySelector('canvas')
+
+        const canvasPos = getPosition(canvas);
+
+
+        const c = canvas.getContext('2d')
+
+        canvas.width = innerWidth
+        canvas.height = innerHeight - 70;
+
+        addEventListener('resize', () => {
+            canvas.width = innerWidth
+            canvas.height = innerHeight
+
+            init()
+        })
+
+        const mouse = {
+            x: innerWidth / 2,
+            y: innerHeight / 2
+        }
+
+        function random_rgb() {
+            var o = Math.round, r = Math.random, s = 255;
+            return 'rgb(' + o(r() * s) + ',' + o(r() * s) + ',' + o(r() * s) + ')';
+        }
+
+        var colors = [
+            random_rgb(),
+            random_rgb(),
+            random_rgb(),
+        ]
+
+        // Event Listeners
+        addEventListener('mousemove', event => {
+            mouse.x = event.clientX - canvasPos.x;
+            mouse.y = event.clientY - canvasPos.y;
+        })
+
+
+        addEventListener('resize', () => {
+            canvas.width = innerWidth
+            canvas.height = innerHeight
+            init()
+        })
+
+        // Objects
+        function Particle(x, y, radius, color) {
+            this.x = x
+            this.y = y
+            this.radius = radius
+            this.color = color
+            this.radians = Math.random() * Math.PI * zuf2;
+            this.velocity = zuf;
+            this.distanceFromCenter = randomIntFromRange(zuf25, zuf10)
+            this.lastMouse = { x: x, y: y }
+
+            this.update = function () {
+                const lastPoint = { x: this.x, y: this.y }
+                //move points overtime
+                this.radians += this.velocity
+
+                //drag effect
+                this.lastMouse.x += (mouse.x - this.lastMouse.x) * zuf0;
+                this.lastMouse.y += (mouse.y - this.lastMouse.y) * zuf0;
+
+                //circular motion
+                this.x = this.lastMouse.x + Math.cos(this.radians) * this.distanceFromCenter;
+                this.y = this.lastMouse.y + Math.sin(this.radians) * this.distanceFromCenter;
+                this.draw(lastPoint)
+            }
+
+            this.draw = lastPoint => {
+                c.beginPath()
+                c.strokeStyle = this.color;
+                c.lineWidth = this.radius;
+                c.moveTo(lastPoint.x, lastPoint.y)
+                c.lineTo(this.x, this.y)
+                c.stroke()
+                c.closePath()
+            }
+
+        }
+
+        // Implementation
+        let particles
+        function init() {
+            particles = []
+            var zuf = (Math.random());
+
+            for (let i = 0; i < 150; i++) {
+                const radius = (Math.random() * 2) + 1;
+                particles.push(new Particle(mouse.x, mouse.y, radius, randomColor(colors)));
+            }
+        }
+
+        // Animation Loop
+        function animate() {
+            requestAnimationFrame(animate)
+            c.fillStyle = 'rgba(255, 255, 255, 0.00000001)'
+            c.fillRect(0, 0, canvas.width, canvas.height)
+
+            particles.forEach(particle => {
+                particle.update();
+            });
+
+        }
+        main()
+        function main() {
+
+            setTimeout(function onTick() {
+                zuf = (Math.random());
+                zuf0 = (Math.random());
+                zuf1 = (Math.random());
+                zuf2 = (Math.random() * 2);
+                zuf10 = (Math.random() * 10);
+                zuf25 = (Math.random() * 25);
+                colors = [
+                    random_rgb(),
+                    random_rgb(),
+                    random_rgb(),
+                ];
+                init()
+                animate()
+                main()
+            }, 1500)
+
+        }
+
+
+    </script>
+</body>
+
+</html>
